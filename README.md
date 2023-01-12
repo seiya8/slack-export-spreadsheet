@@ -1,1 +1,2 @@
 # slack-data-csv
+SlackのデータをエクスポートしてCSVにする。
