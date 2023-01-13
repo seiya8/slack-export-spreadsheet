@@ -10,11 +10,11 @@ with open('users.json', 'r') as f:
     user_dict = json.load(f)
 
 for channel_name in channel_dict.values():
-    with open(os.path.join(channel_name, f"{channel_name}_message.json"), 'r') as f:
+    with open(os.path.join(channel_name, f'{channel_name}_message.json'), 'r') as f:
         message_list = json.load(f)
         
     with open(f'{channel_name}.csv', 'w') as f:
-        writer = csv.writer(f, delimiter=",", quotechar='"', lineterminator='\n')
+        writer = csv.writer(f, delimiter=',', quotechar='"', lineterminator='\n')
 
         for thread in message_list:
             for i, message in enumerate(thread):
