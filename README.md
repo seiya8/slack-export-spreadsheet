@@ -1,4 +1,4 @@
-# slack-data-csv
+# slack-export-spreadsheet
 SlackのデータをエクスポートしてCSVにする。
 やること:
 - メッセージのデータ(JSON)と添付ファイルを保存
