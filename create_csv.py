@@ -4,34 +4,28 @@ import csv
 from datetime import datetime
 
 with open('channels.json', 'r') as f:
-    ch_dict = json.load(f)
+    channel_dict = json.load(f)
 
 with open('users.json', 'r') as f:
-    usr_id2name = json.load(f)
+    user_dict = json.load(f)
 
-for ch_name in ch_dict.values():
-    with open(os.path.join(ch_name, f"{ch_name}_channel_hist.json"), 'r') as f:
-        msg_list = json.load(f)
+for channel_name in channel_dict.values():
+    with open(os.path.join(channel_name, f"{channel_name}_message.json"), 'r') as f:
+        message_list = json.load(f)
         
-    with open(f'{ch_name}.csv', 'w') as f:
+    with open(f'{channel_name}.csv', 'w') as f:
         writer = csv.writer(f, delimiter=",", quotechar='"', lineterminator='\n')
-        # writer.writerow(["time", "name", "post", "files", "reply"])
 
-        for thread in msg_list:
-            for i, msg in enumerate(thread):
-                post_time = datetime.fromtimestamp(int(float(msg['ts']))).strftime('%Y-%m-%d %H:%M')
-                name = usr_id2name[msg['user']]
-                if i:
-                    post = ''
-                    reply = msg['text']
-                else:
-                    post = msg['text']
-                    reply = ''
+        for thread in message_list:
+            for i, message in enumerate(thread):
+                post_time = datetime.fromtimestamp(int(float(message['ts']))).strftime('%Y-%m-%d %H:%M')
+                name = user_dict[message['user']]
+                post = '' if i else message['text']
+                reply = message['text'] if i else ''
 
-                for k, v in usr_id2name.items():
-                    post = post.replace(k, v)
-                    reply = reply.replace(k, v)
+                for user_id, user_name in user_dict.items():
+                    post = post.replace(user_id, user_name)
+                    reply = reply.replace(user_id, user_name)
 
-                files_name = '\n'.join(map(lambda x: x['url_private_download'], msg['files'])) if 'files' in msg.keys() else ''
-
+                files_name = '\n'.join(map(lambda x: x['url_private_download'], message['files'])) if 'files' in message.keys() else ''
                 writer.writerow([post_time, name, post, files_name, reply])
