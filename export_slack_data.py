@@ -72,14 +72,16 @@ def download_files(channel_name, thread_list):
                     dl_url = file_dict['url_private_download']
                     content = fetch_file(dl_url, headers)
 
-                    save_dirname = os.path.join(channel_name, message_dict['ts'])
+                    save_dirname = os.path.join('output', 'attached_files', channel_name, message_dict['ts'])
                     os.makedirs(save_dirname, exist_ok=True)
                     save_file(content, os.path.join(save_dirname, file_dict['name']))
 
 if __name__ == '__main__':
+    os.makedirs('output/json_files', exist_ok=True)
+
     token = sys.argv[1]
     headers = {'Authorization': f'Bearer {token}'}
-    print(token)
+
     user_dict = parse_user_json(headers)
     dump_json(user_dict, 'users.json')
     channel_dict = parse_channel_json(headers)
@@ -87,11 +89,11 @@ if __name__ == '__main__':
     
     for channel_id, channel_name in channel_dict.items():
         print(channel_name)
-        os.makedirs(channel_name, exist_ok=True)
 
         params = {'channel': channel_id, 'limit': '1000', 'oldest': '0'}
         thread_list = get_thread_list(headers, params)
 
-        save_message_path = os.path.join(channel_name, f'{channel_name}_message.json')
+        os.makedirs(f'output/attached_files/{channel_name}', exist_ok=True)
+        save_message_path = os.path.join('output/json_files', f'{channel_name}_message.json')
         dump_json(thread_list, save_message_path)
         download_files(channel_name, thread_list)
