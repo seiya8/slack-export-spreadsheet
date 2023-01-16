@@ -31,7 +31,7 @@ for channel_name in channel_dict.values():
 
                 if 'files' in message:
                     dirname = os.path.join('output', 'attached_files', channel_name, str(ts_float))
-                    files_name = '\n'.join(map(lambda x: os.path.join(dirname, x['url_private_download'].split('/')[-1]), message['files']))
+                    files_name = '\n'.join(map(lambda x: os.path.join(dirname, x['name']), message['files']))
                 else:
                     files_name = ''
                 writer.writerow([post_time, name, post, files_name, reply])
