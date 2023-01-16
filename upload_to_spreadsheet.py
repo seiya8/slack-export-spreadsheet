@@ -37,10 +37,6 @@ class DriveUploader:
         file.Upload()
         return file['id']
 
-class SpreadSheet:
-    def __init__(self, title):
-
-
 if __name__ == '__main__':
     json_file = sys.argv[1]
     folder_id = sys.argv[2]
