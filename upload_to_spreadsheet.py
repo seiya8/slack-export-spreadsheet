@@ -4,7 +4,7 @@ import sys
 import time
 
 import gspread
-from gspread_formatting import set_column_width
+from gspread_formatting import set_column_widths
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from oauth2client.service_account import ServiceAccountCredentials
@@ -37,6 +37,10 @@ class DriveUploader:
         file.Upload()
         return file['id']
 
+class SpreadSheet:
+    def __init__(self, title):
+
+
 if __name__ == '__main__':
     json_file = sys.argv[1]
     folder_id = sys.argv[2]
@@ -47,7 +51,7 @@ if __name__ == '__main__':
     with open('channels.json', 'r') as f:
         channel_dict = json.load(f)
 
-    sh_id = uploader.create_file(folder_id, 'message', 'application/vnd.google-apps.spreadsheet')
+    sh_id = uploader.create_file(folder_id, 'posts', 'application/vnd.google-apps.spreadsheet')
     gc = gspread.authorize(credentials)
     sh_url = f'https://docs.google.com/spreadsheets/d/{sh_id}'
     sh = gc.open_by_url(sh_url)
@@ -56,11 +60,7 @@ if __name__ == '__main__':
         print(f'channel: {channel_name}')
         ws = sh.add_worksheet(title=channel_name, rows=1000, cols=26)
             
-        set_column_width(ws, 'A', 120)
-        set_column_width(ws, 'B', 120)
-        set_column_width(ws, 'C', 600)
-        set_column_width(ws, 'D', 300)
-        set_column_width(ws, 'E', 600)
+        set_column_widths(ws, [('A', 120), ('B', 120), ('C', 600), ('D', 300), ('E', 600)])
         ws.format('A:E', {'wrapStrategy': 'WRAP', 'verticalAlignment': 'TOP'})
             
         time.sleep(1)
@@ -68,7 +68,6 @@ if __name__ == '__main__':
         with open(f'output/csv_files/{channel_name}.csv') as f:
             reader = csv.reader(f)
             for i, row in enumerate(reader):
-                # print(row)
                 if row[3]:
                     ts = row[3].split('/')[-2]
                     subfolder_id = uploader.create_file(channel_folder_id, ts, 'application/vnd.google-apps.folder')
