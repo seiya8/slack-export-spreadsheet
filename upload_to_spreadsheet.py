@@ -53,6 +53,7 @@ if __name__ == '__main__':
     sh = gc.open_by_url(sh_url)
 
     for channel_name in channel_dict.values():
+        print(f'channel: {channel_name}')
         ws = sh.add_worksheet(title=channel_name, rows=1000, cols=26)
             
         set_column_width(ws, 'A', 120)
