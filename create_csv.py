@@ -19,7 +19,8 @@ for channel_name in channel_dict.values():
 
         for thread in message_list:
             for i, message in enumerate(thread):
-                post_time = datetime.fromtimestamp(int(float(message['ts']))).strftime('%Y-%m-%d %H:%M')
+                ts_float = float(message['ts'])
+                post_time = datetime.fromtimestamp(int(ts_float)).strftime('%Y-%m-%d %H:%M')
                 name = user_dict[message['user']]
                 post = '' if i else message['text']
                 reply = message['text'] if i else ''
@@ -28,5 +29,9 @@ for channel_name in channel_dict.values():
                     post = post.replace(user_id, user_name)
                     reply = reply.replace(user_id, user_name)
 
-                files_name = '\n'.join(map(lambda x: x['url_private_download'], message['files'])) if 'files' in message.keys() else ''
+                if 'files' in message:
+                    dirname = os.path.join('output', 'attached_files', channel_name, str(ts_float))
+                    files_name = '\n'.join(map(lambda x: os.path.join(dirname, x['url_private_download'].split('/')[-1]), message['files']))
+                else:
+                    files_name = ''
                 writer.writerow([post_time, name, post, files_name, reply])
