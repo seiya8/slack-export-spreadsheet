@@ -30,7 +30,12 @@ for channel_name in channel_dict.values():
 
                 if 'files' in message:
                     dirname = os.path.join('output', 'attached_files', channel_name, message['ts'])
-                    files_name = '\n'.join(map(lambda x: os.path.join(dirname, x['name']), message['files']))
+                    for i, file in enumerate(message['files']):
+                        file_name = os.path.join(dirname, file['name'])
+                        if not i:
+                            writer.writerow([post_time, name, post, file_name, reply])
+                        else:
+                            writer.writerow([post_time, name, '', file_name, ''])
+
                 else:
-                    files_name = ''
-                writer.writerow([post_time, name, post, files_name, reply])
+                    writer.writerow([post_time, name, post, '', reply])
