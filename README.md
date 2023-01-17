@@ -2,7 +2,7 @@
 SlackからSlack APIを使ってパブリックチャンネルの履歴を取得し、スプシを作るコードです。スレッドの返信も取得します。添付ファイルはドライブにアップされ、スプシにはそのリンクが貼られます。
 スプシの各シートが各チャンネルの履歴に対応しています。
 
-This code downloads the public channel histories of Slack via Slack API and creates a spreadsheet. Thread replies are also included. Attached files are uploaded to the Google Drive and links to them are put in the spreeadsheet. Each sheet of the spreeadsheet corresponds to the history of each channel.
+This code downloads the public channel histories of Slack via Slack API and creates a spreadsheet. Thread replies are also included. Attached files are uploaded to the Google Drive and links to them are put in the spreadsheet. Each sheet of the spreeadsheet corresponds to the history of each channel.
 
 ## 使い方 How to use the code
 - このリポジトリをクローンする。 Clone this repository.
