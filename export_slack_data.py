@@ -99,9 +99,9 @@ def create_csv(channel_name, user_dict, thread_list):
                         for i, file in enumerate(message['files']):
                             file_name = os.path.join(dirname, file['name'])
                             if i: post, reply = '', ''
-                            writer.writerow([post_time, name, post, file_name, reply])
+                            writer.writerow([post_time, message['user'], name, post, file_name, reply])
                     else:
-                        writer.writerow([post_time, name, post, file_name, reply])
+                        writer.writerow([post_time, message['user'], name, post, file_name, reply])
 
 def fetch_profile_images(user_dict):
     for user_id in user_dict:
