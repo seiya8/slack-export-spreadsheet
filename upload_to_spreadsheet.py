@@ -68,7 +68,7 @@ if __name__ == '__main__':
         print(f'channel: {channel_name}')
         ws = sh.add_worksheet(title=channel_name, rows=2000, cols=26)
 
-        set_column_widths(ws, [('A', 120), ('B', 20), ('C', 120), ('D', 550), ('E', 300), ('F', 550)])
+        set_column_widths(ws, [('A', 120), ('B', 20), ('C', 120), ('D', 550), ('E', 550), ('F', 300)])
         ws.format('A:F', {'wrapStrategy': 'WRAP', 'verticalAlignment': 'TOP'})
 
         time.sleep(1)
@@ -78,14 +78,14 @@ if __name__ == '__main__':
             for i, row in enumerate(reader):
                 profile_image_id = profile_image_id_dict[row[1]]
                 row[1] = f'=IMAGE("https://drive.google.com/uc?export=download&id={profile_image_id}", 4, 20, 20)'
-                if row[4]:
-                    ts = row[4].split('/')[-2]
+                if row[5]:
+                    ts = row[5].split('/')[-2]
                     subfolder_id = uploader.create_file(channel_folder_id, ts, 'application/vnd.google-apps.folder')
 
                     time.sleep(1)
-                    file_id = uploader.upload_file(subfolder_id, row[4])
-                    file_name = row[4].split('/')[-1]
-                    row[4] = f'=HYPERLINK("https://drive.google.com/file/d/{file_id}", "{file_name}")'
+                    file_id = uploader.upload_file(subfolder_id, row[5])
+                    file_name = row[5].split('/')[-1]
+                    row[5] = f'=HYPERLINK("https://drive.google.com/file/d/{file_id}", "{file_name}")'
 
                 cell_list = ws.range(i+1, 1, i+1, 6)
                 for j, v in enumerate(row):
