@@ -18,10 +18,10 @@ def fetch_user(headers):
 
 def parse_user_json(headers):
     user_list = fetch_user(headers)
-
     user_id_name_dict = {}
     for user_dict in user_list:
-        user_id_name_dict[user_dict['id']] = user_dict['profile']['real_name']
+        user_id_name_dict[user_dict['id']] = {'name': user_dict['profile']['real_name'], 'image': user_dict['profile']['image_32']}
+
     return user_id_name_dict
 
 def fetch_channel(headers):
@@ -48,7 +48,7 @@ def fetch_reply(headers, params):
     response_json = requests.get('https://slack.com/api/conversations.replies', headers=headers, params=params).json()
     return response_json['messages']
 
-def fetch_file(url, headers):
+def fetch_file(url, headers=None):
     time.sleep(1)
     return requests.get(url, allow_redirects=True, headers=headers, stream=True).content
 
@@ -84,11 +84,12 @@ def create_csv(channel_name, user_dict, thread_list):
         for thread in thread_list:
                 for i, message in enumerate(thread):
                     post_time = datetime.fromtimestamp(int(float(message['ts']))).strftime('%Y-%m-%d %H:%M')
-                    name = user_dict[message['user']]
+                    name = user_dict[message['user']]['name']
                     post = '' if i else message['text']
                     reply = message['text'] if i else ''
 
-                    for user_id, user_name in user_dict.items():
+                    for user_id in user_dict:
+                        user_name = user_dict[user_id]['name']
                         post = post.replace(user_id, user_name)
                         reply = reply.replace(user_id, user_name)
 
@@ -98,13 +99,22 @@ def create_csv(channel_name, user_dict, thread_list):
                         for i, file in enumerate(message['files']):
                             file_name = os.path.join(dirname, file['name'])
                             if i: post, reply = '', ''
-                            writer.writerow([post_time, name, post, file_name, reply])
+                            writer.writerow([post_time, message['user'], name, post, file_name, reply])
                     else:
-                        writer.writerow([post_time, name, post, file_name, reply])
+                        writer.writerow([post_time, message['user'], name, post, file_name, reply])
+
+def fetch_profile_images(user_dict):
+    for user_id in user_dict:
+        user_name = user_dict[user_id]['name']
+        image_url = user_dict[user_id]['image']
+        image = fetch_file(image_url)
+        save_file(image, os.path.join('output', 'profile_images', f'{user_id}.png'))
+
 
 if __name__ == '__main__':
     os.makedirs('output/json_files', exist_ok=True)
     os.makedirs('output/csv_files', exist_ok=True)
+    os.makedirs('output/profile_images', exist_ok=True)
 
     headers = {'Authorization': f'Bearer {sys.argv[1]}'}
 
@@ -112,7 +122,9 @@ if __name__ == '__main__':
     dump_json(user_dict, 'users.json')
     channel_dict = parse_channel_json(headers)
     dump_json(channel_dict, 'channels.json')
-    
+
+    fetch_profile_images(user_dict)
+
     for channel_id, channel_name in channel_dict.items():
         print(f'channel: {channel_name}')
 
