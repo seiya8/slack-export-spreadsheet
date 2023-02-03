@@ -116,8 +116,7 @@ if __name__ == '__main__':
     os.makedirs('output/csv_files', exist_ok=True)
     os.makedirs('output/profile_images', exist_ok=True)
 
-    # headers = {'Authorization': f'Bearer {sys.argv[1]}'}
-    headers = {'Authorization': f'Bearer xoxp-2793838995697-2783475155124-4027733382323-3713bbd5b6973d43b2f8d073e2e2d7a4'}
+    headers = {'Authorization': f'Bearer {sys.argv[1]}'}
 
     user_dict = parse_user_json(headers)
     dump_json(user_dict, 'users.json')
