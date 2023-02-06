@@ -82,26 +82,26 @@ def create_csv(channel_name, user_dict, thread_list):
     with open(os.path.join('output', 'csv_files', f'{channel_name}.csv'), 'w') as f:
         writer = csv.writer(f, delimiter=',', quotechar='"', lineterminator='\n')
         for thread in thread_list:
-                for i, message in enumerate(thread):
-                    post_time = datetime.fromtimestamp(int(float(message['ts']))).strftime('%Y-%m-%d %H:%M')
-                    name = user_dict[message['user']]['name']
-                    post = '' if i else message['text']
-                    reply = message['text'] if i else ''
+            for i, message in enumerate(thread):
+                post_time = datetime.fromtimestamp(int(float(message['ts']))).strftime('%Y-%m-%d %H:%M')
+                name = user_dict[message['user']]['name']
+                post = '' if i else message['text']
+                reply = message['text'] if i else ''
 
-                    for user_id in user_dict:
-                        user_name = user_dict[user_id]['name']
-                        post = post.replace(user_id, user_name)
-                        reply = reply.replace(user_id, user_name)
+                for user_id in user_dict:
+                    user_name = user_dict[user_id]['name']
+                    post = post.replace(user_id, user_name)
+                    reply = reply.replace(user_id, user_name)
 
-                    file_name = ''
-                    if 'files' in message:
-                        dirname = os.path.join('output', 'attached_files', channel_name, message['ts'])
-                        for i, file in enumerate(message['files']):
-                            file_name = os.path.join(dirname, file['name'])
-                            if i: post, reply = '', ''
-                            writer.writerow([post_time, message['user'], name, post, reply, file_name])
-                    else:
+                file_name = ''
+                if 'files' in message:
+                    dirname = os.path.join('output', 'attached_files', channel_name, message['ts'])
+                    for i, file in enumerate(message['files']):
+                        file_name = os.path.join(dirname, file['name'])
+                        if i: post, reply = '', ''
                         writer.writerow([post_time, message['user'], name, post, reply, file_name])
+                else:
+                    writer.writerow([post_time, message['user'], name, post, reply, file_name])
 
 def fetch_profile_images(user_dict):
     for user_id in user_dict:

@@ -1,4 +1,6 @@
 gspread
 gspread-formatting
 pydrive
+python-dateutil
 oauth2client
+slack-sdk
