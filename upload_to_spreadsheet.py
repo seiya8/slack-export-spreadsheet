@@ -8,6 +8,7 @@ import time
 
 from dateutil.relativedelta import relativedelta
 import gspread
+from gspread.cell import Cell
 from gspread_formatting import set_column_widths
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -74,6 +75,8 @@ if __name__ == '__main__':
     uploader = DriveUploader(credentials)
 
     profile_image_id_dict = uploader.upload_profile_images()
+    with open('./profile_image_id.json', 'w') as f:
+        json.dump(profile_image_id_dict, f, ensure_ascii=False, indent=2)
 
     with open('channels.json', 'r') as f:
         channel_dict = json.load(f)
@@ -92,6 +95,7 @@ if __name__ == '__main__':
 
         time.sleep(1)
         channel_folder_id = uploader.create_file(folder_id, channel_name, 'application/vnd.google-apps.folder')
+        cell_list = []
         with open(f'output/csv_files/{channel_name}.csv') as f:
             reader = csv.reader(f)
             for i, row in enumerate(reader):
@@ -106,15 +110,14 @@ if __name__ == '__main__':
                     file_name = row[5].split('/')[-1]
                     row[5] = f'=HYPERLINK("https://drive.google.com/file/d/{file_id}", "{file_name}")'
 
-                cell_list = ws.range(i+1, 1, i+1, 6)
                 for j, v in enumerate(row):
-                    cell_list[j].value = v
+                    cell_list.append(Cell(row=i+1, col=j+1, value=v))
 
-                time.sleep(1)
-                ws.update_cells(cell_list, value_input_option='USER_ENTERED')
+            time.sleep(1)
+            ws.update_cells(cell_list, value_input_option='USER_ENTERED')
     sh.del_worksheet(sh.worksheet('Sheet1'))
     # os.system('rm -rf output')
     slack_notifier = SlackNotifier(bot_token)
     next_date = (datetime.datetime.now() + relativedelta(days=89)).strftime('%B %-d')
     text = f'Backup spreadsheet updated: {sh_url}.\nNext time please back up by {next_date}'
-    slack_notifier.send_messageav(slack_channel_id, text)
+    # slack_notifier.send_messageav(slack_channel_id, text)
