@@ -1,14 +1,19 @@
 import csv
+import datetime
 import json
+import logging
 import os
 import sys
 import time
 
+from dateutil.relativedelta import relativedelta
 import gspread
 from gspread_formatting import set_column_widths
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from oauth2client.service_account import ServiceAccountCredentials
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 
 class DriveUploader:
     def __init__(self, credentials):
@@ -47,9 +52,23 @@ class DriveUploader:
             file_id_dict[filename.split('.')[0]] = file_id
         return file_id_dict
 
+class SlackNotifier:
+    def __init__(self, token):
+        self.client = WebClient(token=token)
+
+    def send_message(self, channel_id, text):
+        logger = logging.getLogger(__name__)
+        try:
+            result = self.client.chat_postMessage(channel=channel_id, text=text)
+            logger.info(result)
+        except SlackApiError as e:
+            logger.error(f"Error posting message: {e}")
+
 if __name__ == '__main__':
     json_file = sys.argv[1]
     folder_id = sys.argv[2]
+    bot_token = sys.argv[3]
+    slack_channel_id = sys.argv[4]
 
     credentials = ServiceAccountCredentials.from_json_keyfile_name(json_file, ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/spreadsheets'])
     uploader = DriveUploader(credentials)
@@ -94,3 +113,8 @@ if __name__ == '__main__':
                 time.sleep(1)
                 ws.update_cells(cell_list, value_input_option='USER_ENTERED')
     sh.del_worksheet(sh.worksheet('Sheet1'))
+    # os.system('rm -rf output')
+    slack_notifier = SlackNotifier(bot_token)
+    next_date = (datetime.datetime.now() + relativedelta(days=89)).strftime('%B %-d')
+    text = f'Backup spreadsheet updated: {sh_url}.\nNext time please back up by {next_date}'
+    slack_notifier.send_messageav(slack_channel_id, text)
